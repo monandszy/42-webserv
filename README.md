@@ -23,7 +23,7 @@ A HTTP server in C++ 98
 - `client_max_body_size <size>`: Sets the maximum allowed size for a client's request body (e.g., 10m, 1g, etc).
 ### Server scope - server{} block
 - `listen <host>:<port>`: Specifies the IP address and port the server binds to (e.g., 127.0.0.1:8080).
-- `server_name <name>`: The domain name or identifier for the virtual server (e.g., first.com).
+- `name <name>`: The domain name or identifier for the virtual server (e.g., first.com).
 - `error_page <code...> <path>`: Associates one or more HTTP error codes with a custom error HTML page (e.g., error_page 404 /404.html; or error_page 500 502 /50x.html;).
 ### Route scope - location{} block
 - `accept <methods...>`: Specifies the allowed HTTP methods for the endpoint (e.g., GET POST).
@@ -31,7 +31,7 @@ A HTTP server in C++ 98
 - `index <files...>`: The default file(s) to serve when a directory is requested (e.g., index.html index.htm;).
 - `autoindex <on|off>`: Enables or disables automatic directory listing (Generates an index.html, listing the structure. If off returns 403 Forbidden).
 - `redirect <code> <url>`: Configures HTTP redirection, returning the specified status code and redirecting to the target URL (e.g., redirect 301 http://example.com/new-url;).
-- `upload_enable <on|off>`: Authorizes file uploads for the endpoint.
+- `upload <on|off>`: Authorizes file uploads for the endpoint.
 - `upload_store <directory>`: Specifies the directory where uploaded files will be to saved
 - `cgi_pass <extension> <executable_path>`: Specifies an executable to process a given file extension
 
