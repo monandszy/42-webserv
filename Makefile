@@ -2,7 +2,10 @@ NAME = webserv
 CC = c++
 CFLAGS = -g -Wall -Wextra -Werror -std=c++98
 SRC = \
-	main.cpp
+	main.cpp \
+	domain/Root.cpp \
+	domain/Location.cpp \
+	domain/Server.cpp
 
 
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.cpp=.o))
@@ -12,6 +15,7 @@ all: $(NAME)
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
+	mkdir -p $(OBJ_DIR)/domain
 
 $(OBJ_DIR)/%.o: %.cpp | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@ 
