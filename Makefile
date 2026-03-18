@@ -27,7 +27,7 @@ format:
 	find -iname '*.hpp' -o -iname '*.cpp' | xargs clang-format --style=Google -i
 
 test: 
-	./$(NAME)
+	./$(NAME) example.conf
 
 run: re test
 
