@@ -53,8 +53,11 @@ class Location {
   void setRedirectUrl(const std::string& redirect_url);
   void setUpload(bool upload);
   void setUploadStoreUrl(const std::string& upload_store_url);
-  void setMethods(const std::vector<HttpMethod>& methods);
+
   void setRoot(const std::string& root);
+  void addIndex(const std::string& index);
+  void addMethod(const HttpMethod& method);
+  void addCgiPass(const std::string& extension, const std::string& executable);
 };
 
 #endif

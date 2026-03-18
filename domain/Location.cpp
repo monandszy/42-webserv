@@ -50,7 +50,13 @@ void Location::setUpload(bool upload) { _upload = upload; }
 void Location::setUploadStoreUrl(const std::string& upload_store_url) {
   _upload_store_url = upload_store_url;
 }
-void Location::setMethods(const std::vector<HttpMethod>& methods) {
-  _methods = methods;
-}
+
 void Location::setRoot(const std::string& root) { _root = root; }
+void Location::addMethod(const HttpMethod& method) {
+  _methods.push_back(method);
+}
+void Location::addIndex(const std::string& index) { _index.push_back(index); }
+void Location::addCgiPass(const std::string& extension,
+                          const std::string& executable) {
+  _cgi_pass[extension] = executable;
+}

@@ -29,6 +29,9 @@ class Server {
   const std::string& getName() const;
   const std::map<int, std::string>& getErrorPages() const;
   const std::vector<Location>& getLocations() const;
+
+  void addErrorPage(int code, const std::string& url);
+  void addLocation(const Location& location);
 };
 
 #endif

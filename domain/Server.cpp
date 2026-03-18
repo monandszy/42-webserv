@@ -27,3 +27,11 @@ const std::map<int, std::string>& Server::getErrorPages() const {
   return _error_pages;
 }
 const std::vector<Location>& Server::getLocations() const { return _locations; }
+
+void Server::addErrorPage(int code, const std::string& url) {
+  _error_pages[code] = url;
+}
+
+void Server::addLocation(const Location& location) {
+  _locations.push_back(location);
+}

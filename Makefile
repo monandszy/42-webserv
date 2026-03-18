@@ -5,7 +5,8 @@ SRC = \
 	main.cpp \
 	domain/Root.cpp \
 	domain/Location.cpp \
-	domain/Server.cpp
+	domain/Server.cpp \
+	fixtures/provider.cpp 
 
 
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.cpp=.o))
@@ -16,6 +17,7 @@ all: $(NAME)
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 	mkdir -p $(OBJ_DIR)/domain
+	mkdir -p $(OBJ_DIR)/fixtures
 
 $(OBJ_DIR)/%.o: %.cpp | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@ 

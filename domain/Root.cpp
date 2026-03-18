@@ -20,3 +20,7 @@ Root::~Root() {}
 
 const std::string& Root::getBodySize() const { return _body_size; }
 const std::vector<Server>& Root::getServers() const { return _servers; }
+void Root::setClientMaxBodySize(const std::string& size) {
+  _client_max_body_size = size;
+}
+void Root::addServer(const Server& server) { _servers.push_back(server); }
