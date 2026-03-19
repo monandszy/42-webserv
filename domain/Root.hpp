@@ -8,7 +8,7 @@ class Server;
 
 class Root {
  private:
-  std::string _body_size;
+  std::string _body_size; // figure out the size formatting
 
   std::vector<Server> _servers;
 
