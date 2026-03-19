@@ -1,7 +1,7 @@
 *This project has been created as part of the 42 curriculum by sandrzej, faikhan.*
 
 ### Description
-A HTTP server in C++ 98
+A HTTP server in C++ 98, offering a subset of the HTTP 1.0 RFC.
 
 ### Instructions
 #### Build the program:
@@ -14,18 +14,18 @@ A HTTP server in C++ 98
 ```
 
 ### Resources
-[RFC HTTP/1.0](https://datatracker.ietf.org/doc/html/rfc1945)
-[Conf File Specs](https://nginx.org/en/docs/beginners_guide.html)
-[Error Page Conf](https://serverfault.com/questions/481140/nginx-default-error-page)
+- [RFC HTTP/1.0](https://datatracker.ietf.org/doc/html/rfc1945)
+- [Conf File Specs](https://nginx.org/en/docs/beginners_guide.html)
+- [Error Page Conf](https://serverfault.com/questions/481140/nginx-default-error-page)
 
-## Configuration Specification (.conf)
-### Global scope - http{} block
+### Configuration Specification (.conf)
+#### Global scope - http{} block
 - `body_size <size>`: Sets the maximum allowed size for a client's request body (e.g., 10m, 1g, etc).
-### Server scope - server{} block
+#### Server scope - server{} block
 - `listen <host>:<port>`: Specifies the IP address and port the server binds to (e.g., 127.0.0.1:8080).
 - `name <name>`: The domain name or identifier for the virtual server (e.g., first.com).
 - `error_page <code...> <path>`: Associates one or more HTTP error codes with a custom error HTML page (e.g., error_page 404 /404.html; or error_page 500 502 /50x.html;).
-### Route scope - location{} block
+#### Route scope - location{} block
 - `accept <methods...>`: Specifies the allowed HTTP methods for the endpoint (e.g., GET POST).
 - `root <directory>`: The base directory for file resolution. The requested URI is appended to this path (e.g., if root is /tmp/www, a request to /test/page resolves to /tmp/www/page).
 - `index <files...>`: The default file(s) to serve when a directory is requested (e.g., index.html index.htm;).
@@ -35,7 +35,45 @@ A HTTP server in C++ 98
 - `upload_store <directory>`: Specifies the directory where uploaded files will be to saved
 - `cgi_pass <extension> <executable_path>`: Specifies an executable to process a given file extension
 
-## TODO
+### Requirements
+
+- [ ] Your program must use a configuration file, provided as an argument on the com-
+mand line, or available in a default path.
+- [ ] You cannot execve another web server.
+- [ ] Your server must remain non-blocking at all times and properly handle client dis-
+connections when necessary.
+- [ ] It must be non-blocking and use only 1 poll() (or equivalent) for all the I/O
+operations between the clients and the server (listen included).
+- [ ] poll() (or equivalent) must monitor both reading and writing simultaneously.
+- [ ] You must never do a read or a write operation without going through poll() (or
+equivalent).
+- [ ] Checking the value of errno to adjust the server behaviour is strictly forbidden
+after performing a read or write operation.
+- [ ] You are not required to use poll() (or an equivalent function) for regular disk files;
+read() and write() on them do not require readiness notifications.
+
+I/O that can wait for data (sockets, pipes/FIFOs, etc.) must be
+non-blocking and driven by a single poll() (or equivalent). Calling
+read/recv or write/send on these descriptors without prior readiness
+will result in a grade of 0. Regular disk files are exempt.
+
+- [ ] When using poll() or any equivalent call, you can use every associated macro or
+helper function (e.g., FD_SET for select()).
+- [ ] A request to your server should never hang indefinitely.
+- [ ] Your server must be compatible with standard web browsers of your choice.
+- [ ] NGINX may be used to compare headers and answer behaviours (pay attention to
+differences between HTTP versions).
+- [ ] Your HTTP response status codes must be accurate.
+- [ ] Your server must have default error pages if none are provided.
+- [ ] You can’t use fork for anything other than CGI (like PHP, or Python, and so forth).
+- [ ] You must be able to serve a fully static website.
+- [ ] Clients must be able to upload files.
+- [ ] You need at least the GET, POST, and DELETE methods.
+- [ ] Stress test your server to ensure it remains available at all times.
+- [ ] Your server must be able to listen to multiple ports to deliver different content (see
+Configuration file).
+
+### Functions Research
 <cerrno>
 <cstring>
 <sys/wait.h>
