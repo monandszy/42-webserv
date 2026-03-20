@@ -6,7 +6,10 @@ SRC = \
 	domain/Root.cpp \
 	domain/Location.cpp \
 	domain/Server.cpp \
-	fixtures/provider.cpp 
+	fixtures/provider.cpp \
+	cycle/loop.cpp \
+	cycle/socket_manager.cpp \
+	parser/parser.cpp
 
 
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.cpp=.o))
@@ -18,6 +21,8 @@ $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 	mkdir -p $(OBJ_DIR)/domain
 	mkdir -p $(OBJ_DIR)/fixtures
+	mkdir -p $(OBJ_DIR)/cycle
+	mkdir -p $(OBJ_DIR)/parser
 
 $(OBJ_DIR)/%.o: %.cpp | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@ 

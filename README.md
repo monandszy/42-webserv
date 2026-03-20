@@ -17,6 +17,7 @@ A HTTP server in C++ 98, offering a subset of the HTTP 1.0 RFC.
 - [RFC HTTP/1.0](https://datatracker.ietf.org/doc/html/rfc1945)
 - [Conf File Specs](https://nginx.org/en/docs/beginners_guide.html)
 - [Error Page Conf](https://serverfault.com/questions/481140/nginx-default-error-page)
+- https://en.wikipedia.org/wiki/Transmission_Control_Protocol
 
 ### Configuration Specification (.conf)
 #### Global scope - http{} block
@@ -73,7 +74,7 @@ differences between HTTP versions).
 - [ ] Your server must be able to listen to multiple ports to deliver different content (see
 Configuration file).
 
-### Functions Research
+###  Functions Research
 <cerrno>
 <cstring>
 <sys/wait.h>
@@ -141,6 +142,11 @@ connect: int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 send: ssize_t send(int sockfd, const void *buf, size_t len, int flags);
 recv: ssize_t recv(int sockfd, void *buf, size_t len, int flags);
 
+epoll (epoll_create, epoll_ctl, epoll_wait)
+int epoll_create(int size);
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
+int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout);
+
 setsockopt: int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen);
   for setting socket options
 getsockname: int getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
@@ -150,12 +156,5 @@ getaddrinfo: int getaddrinfo(const char *node, const char *service, const struct
   translates domain names and services (like "google.com", "http") into IP addresses and port numbers.
 freeaddrinfo: void freeaddrinfo(struct addrinfo *res);
 gai_strerror: const char *gai_strerror(int errcode);
-
-epoll (epoll_create, epoll_ctl, epoll_wait)
-int epoll_create(int size);
-int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
-int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout);
-
-
 
 
