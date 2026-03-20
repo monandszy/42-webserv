@@ -9,6 +9,7 @@ SRC = \
 	fixtures/provider.cpp \
 	cycle/loop.cpp \
 	cycle/socket_manager.cpp \
+	cycle/request_manager.cpp \
 	parser/parser.cpp
 
 

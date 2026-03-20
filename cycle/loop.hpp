@@ -14,6 +14,9 @@
 int create_socket();
 void bind_socket(int socket_fd, uint32_t ip_addr, uint16_t host);
 void start_socket(int socket_fd);
+void process_request(int client_fd);
+int init_epoll();
+void register_socket(int epoll_fd, int socket_fd);
 int run();
 
 #endif
