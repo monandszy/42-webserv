@@ -11,7 +11,7 @@ class Server {
  private:
   Server();
   const std::string _host;
-  const int _port;
+  const std::string _port;
   const std::string _name;
 
   // status code, url
@@ -19,13 +19,14 @@ class Server {
   std::vector<Location> _locations;
 
  public:
-  Server(const std::string& host, int port, const std::string& name);
+  Server(const std::string& host, const std::string& port,
+         const std::string& name);
   Server(const Server& other);
   Server& operator=(const Server& other);
   ~Server();
 
   const std::string& getHost() const;
-  int getPort() const;
+  const std::string& getPort() const;
   const std::string& getName() const;
   const std::map<int, std::string>& getErrorPages() const;
   const std::vector<Location>& getLocations() const;

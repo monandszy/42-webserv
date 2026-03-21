@@ -8,7 +8,7 @@ class Server;
 
 class Root {
  private:
-  std::string _body_size; // figure out the size formatting
+  unsigned long _body_size;
 
   std::vector<Server> _servers;
 
@@ -18,10 +18,10 @@ class Root {
   Root& operator=(const Root& other);
   ~Root();
 
-  const std::string& getBodySize() const;
+  unsigned long getBodySize() const;
   const std::vector<Server>& getServers() const;
 
-  void setBodySize(const std::string& body_size);
+  void setBodySize(unsigned long body_size);
   void addServer(const Server& server);
 };
 

@@ -4,10 +4,10 @@
 
 Root createRootFixture() {
   Root root;
-  root.setBodySize("10m");
+  root.setBodySize(1024);
 
   // First server
-  Server server1("127.0.0.1", 8080, "first.com");
+  Server server1("127.0.0.1", "8080", "first.com");
   server1.addErrorPage(404, "/404.html");
   server1.addErrorPage(500, "/50x.html");
   server1.addErrorPage(502, "/50x.html");
@@ -52,7 +52,7 @@ Root createRootFixture() {
   root.addServer(server1);
 
   // Second server
-  Server server2("127.0.0.1", 8081, "second.com");
+  Server server2("127.0.0.1", "8081", "second.com");
 
   Location loc6("/");
   loc6.setRoot("/var/www/html");
