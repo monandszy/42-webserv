@@ -5,8 +5,7 @@
 #include <vector>
 
 /*
-Let's turn this into a static config file, where global socket configurations
-will be.
+TODO Let's turn this into a static config file, with global configuration options for socket.
 */
 
 struct SocketConfig {

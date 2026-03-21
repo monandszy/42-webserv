@@ -60,7 +60,7 @@ void init_sockets(const std::vector<Server>& servers,
   for (std::vector<Server>::const_iterator it = servers.begin();
        it != servers.end(); ++it) {
     int socket_fd = create_socket();
-    // move parsing out of here
+    // TODO move parsing out of here
     bind_socket(socket_fd, parse_string_ip(it->getHost().c_str()),
                 parse_string_port(it->getPort().c_str()));
     start_socket(socket_fd);

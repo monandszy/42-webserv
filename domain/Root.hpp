@@ -8,7 +8,7 @@ class Server;
 
 class Root {
  private:
-  std::string _body_size;  // figure out the size formatting
+  std::string _body_size;  // TODO figure out the format for parsing, maybe it could just be the num of bytes instead of 1m etc, figure out how this will be used.
 
   std::vector<Server> _servers;
 

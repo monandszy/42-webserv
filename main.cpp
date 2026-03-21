@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
       return (std::cerr << "Could not open configuration file" << std::endl, 1);
     }
   }
-  // parse the file
+  // TODO actually parse the file
   Root root = createRootFixture();
   run(root);
 }
