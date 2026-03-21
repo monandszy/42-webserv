@@ -21,7 +21,7 @@ A HTTP server in C++ 98, offering a subset of the HTTP 1.0 RFC.
 
 ### Configuration Specification (.conf)
 #### Global scope - http{} block
-- `body_size <size>`: Sets the maximum allowed size for a client's request body (e.g., 10m, 1g, etc).
+- `body_size <size>`: Sets the maximum allowed size for a client's request body (in bytes).
 #### Server scope - server{} block
 - `listen <host>:<port>`: Specifies the IP address and port the server binds to (e.g., 127.0.0.1:8080).
 - `name <name>`: The domain name or identifier for the virtual server (e.g., first.com).

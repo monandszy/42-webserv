@@ -1,5 +1,8 @@
 #include "loop.hpp"
 
+/*
+TODO parse Request and based on it create Response
+*/
 void process_request(int client_fd) {
   char buffer[1024] = {0};
 

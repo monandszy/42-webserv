@@ -4,7 +4,7 @@
 
 Root createRootFixture() {
   Root root;
-  root.setBodySize("10m");
+  root.setBodySize(1024);
 
   // First server
   Server server1("127.0.0.1", "8080", "first.com");

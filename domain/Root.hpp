@@ -8,7 +8,7 @@ class Server;
 
 class Root {
  private:
-  std::string _body_size;  // TODO figure out the format for parsing, maybe it could just be the num of bytes instead of 1m etc, figure out how this will be used.
+  unsigned long _body_size;
 
   std::vector<Server> _servers;
 
@@ -18,10 +18,10 @@ class Root {
   Root& operator=(const Root& other);
   ~Root();
 
-  const std::string& getBodySize() const;
+  unsigned long getBodySize() const;
   const std::vector<Server>& getServers() const;
 
-  void setBodySize(const std::string& body_size);
+  void setBodySize(unsigned long body_size);
   void addServer(const Server& server);
 };
 
