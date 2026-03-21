@@ -104,8 +104,8 @@ HandleResult request_handler::process_request(int epoll_fd, uint32_t events,
     }
   }
 
-  bool progress = true;
-  while (progress) {
+  bool progress;
+  do {
     progress = false;
 
     switch (client.getStatus()) {
@@ -137,6 +137,7 @@ HandleResult request_handler::process_request(int epoll_fd, uint32_t events,
         break;
       }
     }
-  }
+  } while (progress);
+
   return KEEP_CONNECTION;
 }
