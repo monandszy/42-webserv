@@ -60,30 +60,31 @@ HandleResult read_chunk(Client& client) {
 }
 
 HandleResult process_response(Client& client) {
-  std::cout << "Fully parsed " << client << "\n";
+  if (client.getResponseBuffer().empty()) {
+    std::cout << "Fully parsed " << client << "\n";
+    const char* resp = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK";
+    client.appendResponse(resp);
+  }
 
-  const char* resp = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK";
-  size_t resp_len = strlen(resp);
-
-  // TODO ensure entire len was sent, if not wait for next EPOLLOUT
-  // TODO Handle partial sends (sent < resp_len)
-  // by buffering the remaining bytes and sending them on the next EPOLLOUT.
-  ssize_t sent = send(client.getFd(), resp, resp_len, 0);
+  const std::string& buf = client.getResponseBuffer();
+  ssize_t sent = send(client.getFd(), buf.c_str(), buf.size(), 0);
 
   if (sent <= 0) {
     return DROP_CONNECTION;
   }
+
+  client.consumeResponse(sent);
   return KEEP_CONNECTION;
 }
 
-void squedule_response(int epoll_fd, Client& client) {
+void schedule_epollout(int epoll_fd, Client& client) {
   struct epoll_event event = {};
   event.events = EPOLLIN | EPOLLOUT;
   event.data.fd = client.getFd();
   epoll_ctl(epoll_fd, EPOLL_CTL_MOD, client.getFd(), &event);
 }
 
-void squedule_process_request(int epoll_fd, Client& client) {
+void schedule_epollin(int epoll_fd, Client& client) {
   struct epoll_event event = {};
   event.events = EPOLLIN;
   event.data.fd = client.getFd();
@@ -121,15 +122,17 @@ HandleResult request_handler::process_request(int epoll_fd, uint32_t events,
           if (process_response(client) == DROP_CONNECTION)
             return DROP_CONNECTION;
 
-          if (is_alive(client)) {
-            squedule_process_request(epoll_fd, client);
-            client.reset();
-            progress = true;
-          } else {
-            return DROP_CONNECTION;
+          if (client.getResponseBuffer().empty()) {
+            if (is_alive(client)) {
+              schedule_epollin(epoll_fd, client);
+              client.reset();
+              progress = true;
+            } else {
+              return DROP_CONNECTION;
+            }
           }
         } else {
-          squedule_response(epoll_fd, client);
+          schedule_epollout(epoll_fd, client);
         }
         break;
       }

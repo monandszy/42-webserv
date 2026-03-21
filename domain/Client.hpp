@@ -20,6 +20,7 @@ class Client {
   int _fd;
   CLIENT_STATUS _status;
   std::string _buffer;
+  std::string _response_buffer;
   HttpRequest _request;
 
  public:
@@ -32,6 +33,10 @@ class Client {
   CLIENT_STATUS getStatus() const;
   const std::string& getBuffer() const;
   const HttpRequest& getRequest() const;
+
+  const std::string& getResponseBuffer() const;
+  void consumeResponse(size_t n);
+  void appendResponse(const std::string& data);
 
   void buildRequest(size_t end_pos);
   void buildRequestBody();

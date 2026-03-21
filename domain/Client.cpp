@@ -21,6 +21,7 @@ Client& Client::operator=(const Client& other) {
     _fd = other._fd;
     _status = other._status;
     _buffer = other._buffer;
+    _response_buffer = other._response_buffer;
     _request = other._request;
   }
   return *this;
@@ -33,6 +34,16 @@ int Client::getFd() const { return _fd; }
 CLIENT_STATUS Client::getStatus() const { return _status; }
 
 const std::string& Client::getBuffer() const { return _buffer; }
+
+const std::string& Client::getResponseBuffer() const {
+  return _response_buffer;
+}
+
+void Client::consumeResponse(size_t n) { _response_buffer.erase(0, n); }
+
+void Client::appendResponse(const std::string& data) {
+  _response_buffer.append(data);
+}
 
 const HttpRequest& Client::getRequest() const { return _request; }
 
@@ -53,6 +64,7 @@ void Client::append(const char* data, size_t len) { _buffer.append(data, len); }
 
 void Client::reset() {
   _status = READING_HEADERS;
+  _response_buffer.clear();
   _request.reset();
 }
 
