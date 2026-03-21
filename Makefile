@@ -11,6 +11,7 @@ SRC = \
 	fixtures/provider.cpp \
 	server/server_loop.cpp \
 	server/request_handler.cpp \
+	parser/head_parser.cpp \
 	server/multiplexer.cpp \
 	server/listener.cpp \
 	parser/parser.cpp

@@ -14,15 +14,13 @@ int request_handler::process_connect(int epoll_fd, int socket_fd) {
   return client_fd;
 }
 
-void process_headers(Client& client, size_t end_pos) {
-  // TODO Parse Request Line and Headers from client._buffer
-  // Set Body size if CONTENT_LENGTH found
-  HttpRequest request = client.getRequest();
-  request.setBodySize(0);
-  request.setMethod(GET);
+void process_head(Client& client, size_t end_pos) {
+  client.buildRequest(end_pos);
+
   client.consume(end_pos + HTTP_END.size());
 
-  if (request.getMethod() == POST) {
+  if (client.getRequest().getMethod() == POST &&
+      client.getRequest().getBodySize() > 0) {
     client.setStatus(READING_BODY);
   } else {
     client.setStatus(READY_TO_RESPOND);
@@ -30,10 +28,9 @@ void process_headers(Client& client, size_t end_pos) {
 }
 
 void process_body(Client& client) {
-  HttpRequest request = client.getRequest();
-  request.setBody(client.getBuffer().substr(0, request.getBodySize()));
+  client.buildRequestBody();
 
-  client.consume(request.getBodySize());
+  client.consume(client.getRequest().getBodySize());
 
   client.setStatus(READY_TO_RESPOND);
 }
@@ -53,7 +50,7 @@ int request_handler::process_request(Client& client) {
     if (client.getStatus() == READING_HEADERS) {
       size_t end_pos = client.getBuffer().find(HTTP_END);
       if (end_pos != std::string::npos) {
-        process_headers(client, end_pos);
+        process_head(client, end_pos);
       }
     }
 
@@ -64,16 +61,19 @@ int request_handler::process_request(Client& client) {
     }
 
     if (client.getStatus() == READY_TO_RESPOND) {
-      std::cout << "Fully parsed " << client.getRequest().getMethod()
-                << " request for " << client.getRequest().getUri() << "\n";
+      std::cout << "Fully parsed " << client << std::endl;
 
       const char* resp = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK";
       send(client.getFd(), resp, strlen(resp), 0);
 
-      if (false) {  // TODO keep alive
+      std::string conn = client.getRequest().getHeader(Header::CONNECTION);
+      bool keep_alive =
+          (conn == HeaderValue::KEEP_ALIVE || (conn != HeaderValue::CLOSE));
+
+      if (keep_alive) {
         client.reset();
         continue;
-      }  // there could be another request in the buffer waiting for processing
+      }
       return 1;
     }
     return 0;

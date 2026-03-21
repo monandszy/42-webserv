@@ -4,6 +4,7 @@
 #include <sys/types.h>
 
 #include <map>
+#include <ostream>
 #include <string>
 
 #include "HttpRequest.hpp"
@@ -32,11 +33,16 @@ class Client {
   const std::string& getBuffer() const;
   const HttpRequest& getRequest() const;
 
+  void buildRequest(size_t end_pos);
+  void buildRequestBody();
+
   void setStatus(CLIENT_STATUS status);
 
   void reset();
   void consume(size_t n);
   void append(const char* data, size_t len);
 };
+
+std::ostream& operator<<(std::ostream& os, const Client& client);
 
 #endif

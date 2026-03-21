@@ -8,10 +8,7 @@
   SOCK_STREAM = TCP
 
   Set SO_REUSEADDR to 1 (True) Allow Address Reuse
-<<<<<<< Updated upstream
-=======
   Set O_NONBLOCK while preserving flags
->>>>>>> Stashed changes
 */
 int create_socket() {
   struct protoent* proto = getprotobyname("tcp");

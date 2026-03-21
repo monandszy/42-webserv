@@ -61,3 +61,37 @@ void HttpRequest::reset() {
   _body.clear();
   _body_size = 0;
 }
+
+std::ostream& operator<<(std::ostream& os, const HttpRequest& req) {
+  std::string methodStr;
+  switch (req.getMethod()) {
+    case GET:
+      methodStr = "GET";
+      break;
+    case POST:
+      methodStr = "POST";
+      break;
+    case DELETE:
+      methodStr = "DELETE";
+      break;
+    default:
+      methodStr = "NONE";
+      break;
+  }
+
+  os << "HttpRequest {\n"
+     << "  Method: " << methodStr << "\n"
+     << "  URI: " << req.getUri() << "\n"
+     << "  Version: " << req.getVersion() << "\n"
+     << "  Headers: \n";
+
+  std::map<std::string, std::string>::const_iterator it;
+  for (it = req.getHeaders().begin(); it != req.getHeaders().end(); ++it) {
+    os << "    " << it->first << ": " << it->second << "\n";
+  }
+
+  os << "  Body Size: " << req.getBodySize() << "\n"
+     << "  Body: " << req.getBody() << "\n"
+     << "}";
+  return os;
+}

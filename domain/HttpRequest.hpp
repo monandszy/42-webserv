@@ -4,6 +4,7 @@
 #include <sys/types.h>
 
 #include <map>
+#include <ostream>
 #include <string>
 
 #include "HttpMethod.hpp"
@@ -41,5 +42,7 @@ class HttpRequest {
 
   void reset();
 };
+
+std::ostream& operator<<(std::ostream& os, const HttpRequest& req);
 
 #endif
