@@ -1,6 +1,6 @@
 #include "parser.hpp"
 
-uint32_t parse_string_ip(const char *ip_str) {
+uint32_t parser::parse_string_ip(const char *ip_str) {
   unsigned int a, b, c, d;
 
   if (sscanf(ip_str, "%u.%u.%u.%u", &a, &b, &c, &d) != 4) {
@@ -13,7 +13,7 @@ uint32_t parse_string_ip(const char *ip_str) {
   return htonl(host_ip);
 }
 
-uint16_t parse_string_port(const char *port_str) {
+uint16_t parser::parse_string_port(const char *port_str) {
   char *endptr;
   long port_num = std::strtol(port_str, &endptr, 10);
 

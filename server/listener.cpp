@@ -1,5 +1,5 @@
 #include "../parser/parser.hpp"
-#include "loop.hpp"
+#include "server.hpp"
 
 /*
   Create a listening socket
@@ -55,14 +55,14 @@ void start_socket(int socket_fd) {
   }
 }
 
-void init_sockets(const std::vector<Server>& servers,
-                  std::map<int, Server>& sockets) {
+void listener::init_sockets(const std::vector<Server>& servers,
+                            std::map<int, Server>& sockets) {
   for (std::vector<Server>::const_iterator it = servers.begin();
        it != servers.end(); ++it) {
     int socket_fd = create_socket();
     // TODO move parsing out of here
-    bind_socket(socket_fd, parse_string_ip(it->getHost().c_str()),
-                parse_string_port(it->getPort().c_str()));
+    bind_socket(socket_fd, parser::parse_string_ip(it->getHost().c_str()),
+                parser::parse_string_port(it->getPort().c_str()));
     start_socket(socket_fd);
     sockets.insert(std::make_pair(socket_fd, *it));
   }

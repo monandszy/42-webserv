@@ -7,10 +7,10 @@ SRC = \
 	domain/Location.cpp \
 	domain/Server.cpp \
 	fixtures/provider.cpp \
-	cycle/loop.cpp \
-	cycle/socket_manager.cpp \
-	cycle/request_manager.cpp \
-	cycle/epoll_manager.cpp \
+	server/server_loop.cpp \
+	server/poller.cpp \
+	server/request_handler.cpp \
+	server/listener.cpp \
 	parser/parser.cpp
 
 
@@ -23,7 +23,7 @@ $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 	mkdir -p $(OBJ_DIR)/domain
 	mkdir -p $(OBJ_DIR)/fixtures
-	mkdir -p $(OBJ_DIR)/cycle
+	mkdir -p $(OBJ_DIR)/server
 	mkdir -p $(OBJ_DIR)/parser
 
 $(OBJ_DIR)/%.o: %.cpp | $(OBJ_DIR)

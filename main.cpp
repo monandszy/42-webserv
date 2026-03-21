@@ -1,10 +1,10 @@
 #include <fstream>
 #include <iostream>
 
-#include "cycle/loop.hpp"
 #include "domain/domain.hpp"
 #include "fixtures/provider.hpp"
 #include "parser/parser.hpp"
+#include "server/server.hpp"
 
 int main(int argc, char *argv[]) {
   if (argc > 2) {
@@ -17,5 +17,5 @@ int main(int argc, char *argv[]) {
   }
   // TODO actually parse the file
   Root root = createRootFixture();
-  run(root);
+  server::run(root);
 }
