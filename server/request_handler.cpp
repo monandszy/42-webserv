@@ -6,8 +6,6 @@ void request_handler::process_connect(int epoll_fd, int socket_fd) {
 
   int client_fd = accept(socket_fd, (struct sockaddr*)&addr, &len);
   if (client_fd >= 0) {
-    std::cout << "New client connected." << std::endl;
-
     struct epoll_event event;
     event.events = EPOLLIN;
     event.data.fd = client_fd;
@@ -16,28 +14,62 @@ void request_handler::process_connect(int epoll_fd, int socket_fd) {
 }
 
 std::string HTTP_END = "\r\n\r\n";
+std::string CONTENT_LENGTH = "content-length";
+
+void process_headers(Client& client, size_t end_pos) {
+  // TODO Parse Request Line and Headers from client._buffer
+  // Set Body size if CONTENT_LENGTH found
+  client.consume(end_pos + HTTP_END.size());
+
+  HttpRequest request = client.getRequest();
+  if (request.getMethod() == "POST") {
+    client.setStatus(READING_BODY);
+  } else {
+    client.setStatus(READY_TO_RESPOND);
+  }
+}
+
+void process_body(Client& client) {
+  HttpRequest request = client.getRequest();
+  request.setBody(client.getBuffer().substr(0, request.getBodySize()));
+
+  client.consume(request.getBodySize());
+
+  client.setStatus(READY_TO_RESPOND);
+}
 
 /*
 Read headers until HTTP_END detected
 In case of POST do not close, read based on Content-Length
 */
 int request_handler::process_request(Client& client) {
-  char buffer[10] = {0};
-  ssize_t bytes_received = recv(client.getFd(), buffer, sizeof(buffer) - 1, 0);
+  char tmp_buffer[10] = {0};
+  ssize_t bytes = recv(client.getFd(), tmp_buffer, sizeof(tmp_buffer) - 1, 0);
 
-  if (bytes_received == 0 || bytes_received == -1) {
-    return 1;
-  } else {
-    client.append(buffer, bytes_received);
-    if (client.getBuffer().find(HTTP_END) != std::string::npos) {
-      std::cout << "!!! Full Request Received:\n"
-                << client.getBuffer() << std::endl;
-      const char* response =
-          "HTTP/1.1 200 OK\r\nContent-Length: 17\r\n\r\nMessage received\n";
-      send(client.getFd(), response, strlen(response), 0);
-      return 1;
-    } else {
-      return 0;
-    }
+  if (bytes <= 0) return 1;
+  client.append(tmp_buffer, bytes);
+
+  if (client.getStatus() == READING_HEADERS) {
+    size_t end_pos = client.getBuffer().find(HTTP_END);
+    if (end_pos != std::string::npos) process_headers(client, end_pos);
   }
+
+  if (client.getStatus() == READING_BODY) {
+    if (client.getBuffer().size() >= client.getRequest().getBodySize())
+      process_body(client);
+  }
+
+  if (client.getStatus() == READY_TO_RESPOND) {
+    std::cout << "Fully parsed " << client.getRequest().getMethod()
+              << " request for " << client.getRequest().getUri() << "\n";
+
+    const char* resp = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK";
+    send(client.getFd(), resp, strlen(resp), 0);
+
+    // if keep alive
+    // client.reset();
+    // return 0;
+    return 1;
+  }
+  return 0;
 }

@@ -36,10 +36,11 @@ const HttpRequest& Client::getRequest() const { return _request; }
 
 void Client::setStatus(CLIENT_STATUS status) { _status = status; }
 
-void Client::append(const char* buf, ssize_t len) {
-  if (buf != NULL && len > 0) {
-    _buffer.append(buf, len);
-  }
-}
+void Client::consume(size_t n) { _buffer.erase(0, n); }
 
-void Client::clearBuffer() { _buffer.clear(); }
+void Client::append(const char* data, size_t len) { _buffer.append(data, len); }
+
+void Client::reset() {
+  _status = READING_HEADERS;
+  _request.reset();
+}

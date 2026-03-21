@@ -10,8 +10,8 @@ SRC = \
 	domain/HttpRequest.cpp \
 	fixtures/provider.cpp \
 	server/server_loop.cpp \
-	server/multiplexer.cpp \
 	server/request_handler.cpp \
+	server/multiplexer.cpp \
 	server/listener.cpp \
 	parser/parser.cpp
 

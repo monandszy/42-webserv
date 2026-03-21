@@ -11,6 +11,7 @@
 enum CLIENT_STATUS {
   READING_HEADERS,  // Waiting for \r\n\r\n HTTP_END
   READING_BODY,     // Waiting for body to match Content-Length
+  READY_TO_RESPOND,
 };
 
 class Client {
@@ -33,8 +34,9 @@ class Client {
 
   void setStatus(CLIENT_STATUS status);
 
-  void append(const char* buf, ssize_t len);
-  void clearBuffer();
+  void reset();
+  void consume(size_t n);
+  void append(const char* data, size_t len);
 };
 
 #endif
