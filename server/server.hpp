@@ -32,9 +32,11 @@ int init_epoll(std::map<int, Server>& sockets);
 void loop_epoll(int epoll_fd, std::map<int, Server>& sockets);
 }  // namespace multiplexer
 
+enum HandleResult { KEEP_CONNECTION, DROP_CONNECTION };
+
 namespace request_handler {
 int process_connect(int epoll_fd, int socket_fd);
-int process_request(Client& client);
+HandleResult process_request(int epoll_fd, uint32_t events, Client& client);
 }  // namespace request_handler
 
 #endif

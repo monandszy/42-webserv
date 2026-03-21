@@ -1,3 +1,8 @@
+#include <fcntl.h>
+#include <unistd.h>
+
+#include <iostream>
+
 #include "server.hpp"
 
 /*
@@ -46,7 +51,9 @@ void multiplexer::loop_epoll(int epoll_fd, std::map<int, Server>& sockets) {
           std::cout << "Client connected" << std::endl;
         }
       } else {
-        if (request_handler::process_request(clients[client_fd])) {
+        if (request_handler::process_request(epoll_fd, events[i].events,
+                                             clients[client_fd]) ==
+            DROP_CONNECTION) {
           std::cout << "Client disconnected" << std::endl;
           clients.erase(client_fd);
           close(client_fd);

@@ -44,13 +44,11 @@ A HTTP server in C++ 98, offering a subset of the HTTP 1.0 RFC.
 - [ ] Your program must use a configuration file, provided as an argument on the com-
 mand line, or available in a default path.
 - [ ] You cannot execve another web server.
-- [ ] Your server must remain non-blocking at all times and properly handle client dis-
-connections when necessary.
+- [ ] Your server must remain non-blocking at all times and properly handle client disconnections when necessary.
 - [ ] It must be non-blocking and use only 1 poll() (or equivalent) for all the I/O
 operations between the clients and the server (listen included).
 - [ ] poll() (or equivalent) must monitor both reading and writing simultaneously.
-- [ ] You must never do a read or a write operation without going through poll() (or
-equivalent).
+- [ ] You must never do a read or a write operation without going through poll() (or equivalent).
 - [ ] Checking the value of errno to adjust the server behaviour is strictly forbidden
 after performing a read or write operation.
 - [ ] You are not required to use poll() (or an equivalent function) for regular disk files;
@@ -61,12 +59,11 @@ non-blocking and driven by a single poll() (or equivalent). Calling
 read/recv or write/send on these descriptors without prior readiness
 will result in a grade of 0. Regular disk files are exempt.
 
-- [ ] When using poll() or any equivalent call, you can use every associated macro or
+- [v] When using poll() or any equivalent call, you can use every associated macro or
 helper function (e.g., FD_SET for select()).
 - [ ] A request to your server should never hang indefinitely.
 - [ ] Your server must be compatible with standard web browsers of your choice.
-- [ ] NGINX may be used to compare headers and answer behaviours (pay attention to
-differences between HTTP versions).
+- [ ] NGINX may be used to compare headers and answer behaviours (pay attention to differences between HTTP versions).
 - [ ] Your HTTP response status codes must be accurate.
 - [ ] Your server must have default error pages if none are provided.
 - [ ] You can’t use fork for anything other than CGI (like PHP, or Python, and so forth).

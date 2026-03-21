@@ -1,3 +1,6 @@
+#include <fcntl.h>
+#include <unistd.h>
+
 #include "server.hpp"
 
 int request_handler::process_connect(int epoll_fd, int socket_fd) {
@@ -6,6 +9,10 @@ int request_handler::process_connect(int epoll_fd, int socket_fd) {
 
   int client_fd = accept(socket_fd, (struct sockaddr*)&addr, &len);
   if (client_fd >= 0) {
+    int flags = fcntl(client_fd, F_GETFL, 0);
+    if (flags != -1) {
+      fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
+    }
     struct epoll_event event;
     event.events = EPOLLIN;
     event.data.fd = client_fd;
@@ -14,68 +21,119 @@ int request_handler::process_connect(int epoll_fd, int socket_fd) {
   return client_fd;
 }
 
-void process_head(Client& client, size_t end_pos) {
-  client.buildRequest(end_pos);
+int process_head(Client& client) {
+  size_t end_pos = client.getBuffer().find(HTTP_END);
+  if (end_pos != std::string::npos) {
+    client.buildRequest(end_pos);
+    client.consume(end_pos + HTTP_END.size());
 
-  client.consume(end_pos + HTTP_END.size());
-
-  if (client.getRequest().getMethod() == POST &&
-      client.getRequest().getBodySize() > 0) {
-    client.setStatus(READING_BODY);
-  } else {
-    client.setStatus(READY_TO_RESPOND);
+    if (client.getRequest().getMethod() == POST &&
+        client.getRequest().getBodySize() > 0) {
+      client.setStatus(READING_BODY);
+    } else {
+      client.setStatus(READY_TO_RESPOND);
+    }
+    return 1;
   }
+  return 0;
 }
 
-void process_body(Client& client) {
-  client.buildRequestBody();
+int process_body(Client& client) {
+  if (client.getBuffer().size() >= client.getRequest().getBodySize()) {
+    client.buildRequestBody();
 
-  client.consume(client.getRequest().getBodySize());
+    client.consume(client.getRequest().getBodySize());
 
-  client.setStatus(READY_TO_RESPOND);
+    client.setStatus(READY_TO_RESPOND);
+    return 1;
+  }
+  return 0;
 }
 
-/*
-Read headers until HTTP_END detected
-In case of POST do not close, read based on Content-Length
-*/
-int request_handler::process_request(Client& client) {
-  char tmp_buffer[RECV_SIZE] = {0};
+HandleResult read_chunk(Client& client) {
+  char tmp_buffer[RECV_SIZE];
   ssize_t bytes = recv(client.getFd(), tmp_buffer, sizeof(tmp_buffer) - 1, 0);
 
-  if (bytes <= 0) return 1;
+  if (bytes <= 0) return DROP_CONNECTION;
   client.append(tmp_buffer, bytes);
+  return KEEP_CONNECTION;
+}
 
-  while (1) {
-    if (client.getStatus() == READING_HEADERS) {
-      size_t end_pos = client.getBuffer().find(HTTP_END);
-      if (end_pos != std::string::npos) {
-        process_head(client, end_pos);
-      }
-    }
+HandleResult process_response(Client& client) {
+  std::cout << "Fully parsed " << client << "\n";
 
-    if (client.getStatus() == READING_BODY) {
-      if (client.getBuffer().size() >= client.getRequest().getBodySize()) {
-        process_body(client);
-      }
-    }
+  const char* resp = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK";
+  size_t resp_len = strlen(resp);
 
-    if (client.getStatus() == READY_TO_RESPOND) {
-      std::cout << "Fully parsed " << client << std::endl;
+  // TODO ensure entire len was sent, if not wait for next EPOLLOUT
+  // TODO Handle partial sends (sent < resp_len)
+  // by buffering the remaining bytes and sending them on the next EPOLLOUT.
+  ssize_t sent = send(client.getFd(), resp, resp_len, 0);
 
-      const char* resp = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK";
-      send(client.getFd(), resp, strlen(resp), 0);
-
-      std::string conn = client.getRequest().getHeader(Header::CONNECTION);
-      bool keep_alive =
-          (conn == HeaderValue::KEEP_ALIVE || (conn != HeaderValue::CLOSE));
-
-      if (keep_alive) {
-        client.reset();
-        continue;
-      }
-      return 1;
-    }
-    return 0;
+  if (sent <= 0) {
+    return DROP_CONNECTION;
   }
+  return KEEP_CONNECTION;
+}
+
+void squedule_response(int epoll_fd, Client& client) {
+  struct epoll_event event = {};
+  event.events = EPOLLIN | EPOLLOUT;
+  event.data.fd = client.getFd();
+  epoll_ctl(epoll_fd, EPOLL_CTL_MOD, client.getFd(), &event);
+}
+
+void squedule_process_request(int epoll_fd, Client& client) {
+  struct epoll_event event = {};
+  event.events = EPOLLIN;
+  event.data.fd = client.getFd();
+  epoll_ctl(epoll_fd, EPOLL_CTL_MOD, client.getFd(), &event);
+}
+
+bool is_alive(Client& client) {
+  std::string conn = client.getRequest().getHeader(Header::CONNECTION);
+  return (conn == HeaderValue::KEEP_ALIVE || conn != HeaderValue::CLOSE);
+}
+
+HandleResult request_handler::process_request(int epoll_fd, uint32_t events,
+                                              Client& client) {
+  if (events & EPOLLIN) {
+    if (read_chunk(client) == DROP_CONNECTION) {
+      return DROP_CONNECTION;
+    }
+  }
+
+  bool progress = true;
+  while (progress) {
+    progress = false;
+
+    switch (client.getStatus()) {
+      case READING_HEADERS: {
+        if (process_head(client)) progress = true;
+        break;
+      }
+      case READING_BODY: {
+        if (process_body(client)) progress = true;
+        break;
+      }
+      case READY_TO_RESPOND: {
+        if (events & EPOLLOUT) {
+          if (process_response(client) == DROP_CONNECTION)
+            return DROP_CONNECTION;
+
+          if (is_alive(client)) {
+            squedule_process_request(epoll_fd, client);
+            client.reset();
+            progress = true;
+          } else {
+            return DROP_CONNECTION;
+          }
+        } else {
+          squedule_response(epoll_fd, client);
+        }
+        break;
+      }
+    }
+  }
+  return KEEP_CONNECTION;
 }
