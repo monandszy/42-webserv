@@ -18,6 +18,9 @@ A HTTP server in C++ 98, offering a subset of the HTTP 1.0 RFC.
 - [Conf File Specs](https://nginx.org/en/docs/beginners_guide.html)
 - [Error Page Conf](https://serverfault.com/questions/481140/nginx-default-error-page)
 - https://en.wikipedia.org/wiki/Transmission_Control_Protocol
+- https://www.geeksforgeeks.org/cpp/socket-programming-in-cpp/
+- https://unscriptedcoding.medium.com/multithreaded-server-in-c-using-epoll-baadad32224c
+- http://dwise1.net/pgm/sockets/blocking.html
 
 ### Configuration Specification (.conf)
 #### Global scope - http{} block

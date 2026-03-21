@@ -6,9 +6,11 @@ SRC = \
 	domain/Root.cpp \
 	domain/Location.cpp \
 	domain/Server.cpp \
+	domain/Client.cpp \
+	domain/HttpRequest.cpp \
 	fixtures/provider.cpp \
 	server/server_loop.cpp \
-	server/poller.cpp \
+	server/multiplexer.cpp \
 	server/request_handler.cpp \
 	server/listener.cpp \
 	parser/parser.cpp

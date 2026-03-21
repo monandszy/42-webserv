@@ -2,6 +2,7 @@
 #define LOOP_HPP
 
 #include <arpa/inet.h>
+#include <fcntl.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <sys/epoll.h>
@@ -23,14 +24,14 @@ void init_sockets(const std::vector<Server>& servers,
                   std::map<int, Server>& sockets);
 }
 
-namespace poller {
+namespace multiplexer {
 int init_epoll(std::map<int, Server>& sockets);
 void loop_epoll(int epoll_fd, std::map<int, Server>& sockets);
-}  // namespace poller
+}  // namespace multiplexer
 
 namespace request_handler {
 void process_connect(int epoll_fd, int socket_fd);
-void process_request(int client_fd);
+int process_request(Client& client);
 }  // namespace request_handler
 
 #endif

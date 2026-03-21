@@ -15,21 +15,29 @@ void request_handler::process_connect(int epoll_fd, int socket_fd) {
   }
 }
 
-/*
-TODO parse Request and based on it create Response
-*/
-void request_handler::process_request(int client_fd) {
-  char buffer[1024] = {0};
+std::string HTTP_END = "\r\n\r\n";
 
-  ssize_t bytes_received = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
-  if (bytes_received == 0) {
-    std::cout << "Client disconnected gracefully" << std::endl;
-  } else if (bytes_received < 0) {
-    std::cout << "Client disconnected" << std::endl;
+/*
+Read headers until HTTP_END detected
+In case of POST do not close, read based on Content-Length
+*/
+int request_handler::process_request(Client& client) {
+  char buffer[10] = {0};
+  ssize_t bytes_received = recv(client.getFd(), buffer, sizeof(buffer) - 1, 0);
+
+  if (bytes_received == 0 || bytes_received == -1) {
+    return 1;
   } else {
-    std::cout << "!!!Received: " << buffer << std::endl;
-    const char* response =
-        "HTTP/1.1 200 OK\r\nContent-Length: 17\r\n\r\nMessage received\n";
-    send(client_fd, response, strlen(response), 0);
+    client.append(buffer, bytes_received);
+    if (client.getBuffer().find(HTTP_END) != std::string::npos) {
+      std::cout << "!!! Full Request Received:\n"
+                << client.getBuffer() << std::endl;
+      const char* response =
+          "HTTP/1.1 200 OK\r\nContent-Length: 17\r\n\r\nMessage received\n";
+      send(client.getFd(), response, strlen(response), 0);
+      return 1;
+    } else {
+      return 0;
+    }
   }
 }
