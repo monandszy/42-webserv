@@ -1,6 +1,6 @@
 #include "server.hpp"
 
-void request_handler::process_connect(int epoll_fd, int socket_fd) {
+int request_handler::process_connect(int epoll_fd, int socket_fd) {
   struct sockaddr_in addr;
   socklen_t len = sizeof(addr);
 
@@ -11,18 +11,18 @@ void request_handler::process_connect(int epoll_fd, int socket_fd) {
     event.data.fd = client_fd;
     epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &event);
   }
+  return client_fd;
 }
-
-std::string HTTP_END = "\r\n\r\n";
-std::string CONTENT_LENGTH = "content-length";
 
 void process_headers(Client& client, size_t end_pos) {
   // TODO Parse Request Line and Headers from client._buffer
   // Set Body size if CONTENT_LENGTH found
+  HttpRequest request = client.getRequest();
+  request.setBodySize(0);
+  request.setMethod(GET);
   client.consume(end_pos + HTTP_END.size());
 
-  HttpRequest request = client.getRequest();
-  if (request.getMethod() == "POST") {
+  if (request.getMethod() == POST) {
     client.setStatus(READING_BODY);
   } else {
     client.setStatus(READY_TO_RESPOND);
@@ -43,9 +43,9 @@ Read headers until HTTP_END detected
 In case of POST do not close, read based on Content-Length
 */
 int request_handler::process_request(Client& client) {
-  char tmp_buffer[10] = {0};
+  char tmp_buffer[RECV_SIZE] = {0};
   ssize_t bytes = recv(client.getFd(), tmp_buffer, sizeof(tmp_buffer) - 1, 0);
-
+a
   if (bytes <= 0) return 1;
   client.append(tmp_buffer, bytes);
 

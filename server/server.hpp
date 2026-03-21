@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "../domain/domain.hpp"
+#include "ConstConfig.hpp"
 
 namespace server {
 void run(const Root& root);
@@ -30,7 +31,7 @@ void loop_epoll(int epoll_fd, std::map<int, Server>& sockets);
 }  // namespace multiplexer
 
 namespace request_handler {
-void process_connect(int epoll_fd, int socket_fd);
+int process_connect(int epoll_fd, int socket_fd);
 int process_request(Client& client);
 }  // namespace request_handler
 

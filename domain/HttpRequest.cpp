@@ -1,6 +1,9 @@
 #include "HttpRequest.hpp"
 
-HttpRequest::HttpRequest() {}
+HttpRequest::HttpRequest() {
+  _method = NONE;
+  _body_size = 0;
+}
 
 HttpRequest::HttpRequest(const HttpRequest& other) { *this = other; }
 
@@ -18,7 +21,7 @@ HttpRequest& HttpRequest::operator=(const HttpRequest& other) {
 
 HttpRequest::~HttpRequest() {}
 
-const std::string& HttpRequest::getMethod() const { return _method; }
+const HttpMethod& HttpRequest::getMethod() const { return _method; }
 const std::string& HttpRequest::getUri() const { return _uri; }
 const std::string& HttpRequest::getVersion() const { return _version; }
 const std::map<std::string, std::string>& HttpRequest::getHeaders() const {
@@ -36,7 +39,7 @@ const std::string& HttpRequest::getHeader(const std::string& key) const {
   return empty;
 }
 
-void HttpRequest::setMethod(const std::string& method) { _method = method; }
+void HttpRequest::setMethod(const HttpMethod& method) { _method = method; }
 void HttpRequest::setUri(const std::string& uri) { _uri = uri; }
 void HttpRequest::setVersion(const std::string& version) { _version = version; }
 void HttpRequest::setHeaders(
@@ -51,7 +54,7 @@ void HttpRequest::setHeader(const std::string& key, const std::string& value) {
 }
 
 void HttpRequest::reset() {
-  _method.clear();
+  _method = NONE;
   _uri.clear();
   _version.clear();
   _headers.clear();

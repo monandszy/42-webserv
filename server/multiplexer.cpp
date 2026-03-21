@@ -31,18 +31,20 @@ int multiplexer::init_epoll(std::map<int, Server>& sockets) {
   -1 - sleep indefinitely unitl something happens
 */
 void multiplexer::loop_epoll(int epoll_fd, std::map<int, Server>& sockets) {
-  const int limit = 64;
-  struct epoll_event events[limit];
+  struct epoll_event events[LIMIT];
   std::map<int, Client> clients;
   while (true) {
-    int num_ready = epoll_wait(epoll_fd, events, limit, -1);
+    int num_ready = epoll_wait(epoll_fd, events, LIMIT, TIMEOUT);
     for (int i = 0; i < num_ready; i++) {
       int client_fd = events[i].data.fd;
       if (sockets.find(client_fd) != sockets.end()) {
-        request_handler::process_connect(epoll_fd, client_fd);
-        Client c(client_fd);
-        clients.insert(std::make_pair(client_fd, c));
-        std::cout << "Client connected" << std::endl;
+        int new_client_fd =
+            request_handler::process_connect(epoll_fd, client_fd);
+        if (new_client_fd >= 0) {
+          Client c(new_client_fd);
+          clients.insert(std::make_pair(new_client_fd, c));
+          std::cout << "Client connected" << std::endl;
+        }
       } else {
         if (request_handler::process_request(clients[client_fd])) {
           std::cout << "Client disconnected" << std::endl;

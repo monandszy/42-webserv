@@ -6,9 +6,11 @@
 #include <map>
 #include <string>
 
+#include "HttpMethod.hpp"
+
 class HttpRequest {
  private:
-  std::string _method;
+  HttpMethod _method;
   std::string _uri;
   std::string _version;
   std::map<std::string, std::string> _headers;
@@ -22,14 +24,14 @@ class HttpRequest {
   ~HttpRequest();
   const std::string& getHeader(const std::string& key) const;
 
-  const std::string& getMethod() const;
+  const HttpMethod& getMethod() const;
   const std::string& getUri() const;
   const std::string& getVersion() const;
   const std::map<std::string, std::string>& getHeaders() const;
   const std::string& getBody() const;
   size_t getBodySize() const;
 
-  void setMethod(const std::string& method);
+  void setMethod(const HttpMethod& method);
   void setUri(const std::string& uri);
   void setVersion(const std::string& version);
   void setHeaders(const std::map<std::string, std::string>& headers);
