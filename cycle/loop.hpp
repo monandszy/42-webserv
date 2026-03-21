@@ -10,13 +10,19 @@
 
 #include <cstring>
 #include <iostream>
+#include <map>
+#include <vector>
+
+#include "../domain/domain.hpp"
 
 int create_socket();
 void bind_socket(int socket_fd, uint32_t ip_addr, uint16_t host);
 void start_socket(int socket_fd);
-void process_request(int client_fd);
-int init_epoll();
+int init_epoll(std::map<int, Server>& sockets);
 void register_socket(int epoll_fd, int socket_fd);
-int run();
+void process_request(int client_fd);
+void run(const Root& root);
+void init_sockets(const std::vector<Server>& servers,
+                  std::map<int, Server>& sockets);
 
 #endif

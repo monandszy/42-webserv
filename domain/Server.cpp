@@ -2,7 +2,8 @@
 
 #include "Location.hpp"
 
-Server::Server(const std::string& host, int port, const std::string& name)
+Server::Server(const std::string& host, const std::string& port,
+               const std::string& name)
     : _host(host), _port(port), _name(name) {}
 
 Server::Server(const Server& other)
@@ -21,7 +22,7 @@ Server& Server::operator=(const Server& other) {
 Server::~Server() {}
 
 const std::string& Server::getHost() const { return _host; }
-int Server::getPort() const { return _port; }
+const std::string& Server::getPort() const { return _port; }
 const std::string& Server::getName() const { return _name; }
 const std::map<int, std::string>& Server::getErrorPages() const {
   return _error_pages;

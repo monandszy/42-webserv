@@ -17,5 +17,5 @@ int main(int argc, char *argv[]) {
   }
   // parse the file
   Root root = createRootFixture();
-  run();
+  run(root);
 }

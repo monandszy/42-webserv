@@ -10,6 +10,7 @@ SRC = \
 	cycle/loop.cpp \
 	cycle/socket_manager.cpp \
 	cycle/request_manager.cpp \
+	cycle/epoll_manager.cpp \
 	parser/parser.cpp
 
 

@@ -35,7 +35,6 @@ class Location {
   Location& operator=(const Location& other);
   ~Location();
 
-  // Getters
   const std::string& getPath() const;
   const std::vector<HttpMethod>& getMethods() const;
   const std::string& getRoot() const;
@@ -47,13 +46,11 @@ class Location {
   const std::string& getUploadStoreUrl() const;
   const std::map<std::string, std::string>& getCgiPass() const;
 
-  // Setters
   void setAutoindex(bool autoindex);
   void setRedirectCode(int redirect_code);
   void setRedirectUrl(const std::string& redirect_url);
   void setUpload(bool upload);
   void setUploadStoreUrl(const std::string& upload_store_url);
-
   void setRoot(const std::string& root);
   void addIndex(const std::string& index);
   void addMethod(const HttpMethod& method);

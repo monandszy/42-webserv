@@ -1,5 +1,7 @@
 #include "loop.hpp"
 
+#include "../domain/domain.hpp"
+
 void process_connect(int epoll_fd, int socket_fd) {
   struct sockaddr_in addr;
   socklen_t len = sizeof(addr);
@@ -15,15 +17,15 @@ void process_connect(int epoll_fd, int socket_fd) {
   }
 }
 
-void loop_epoll(int epoll_fd, int socket_fd) {
+void loop_epoll(int epoll_fd, std::map<int, Server>& sockets) {
   const int limit = 10;
   struct epoll_event events[limit];
   while (true) {
     int num_ready = epoll_wait(epoll_fd, events, limit, -1);
     for (int i = 0; i < num_ready; i++) {
       int client_fd = events[i].data.fd;
-      if (client_fd == socket_fd) {
-        process_connect(epoll_fd, socket_fd);
+      if (sockets.find(client_fd) != sockets.end()) {
+        process_connect(epoll_fd, client_fd);
       } else {
         process_request(client_fd);
         close(client_fd);
@@ -32,18 +34,17 @@ void loop_epoll(int epoll_fd, int socket_fd) {
   }
 }
 
-int run() {
-  int socket_fd = create_socket();
-  bind_socket(socket_fd, INADDR_ANY, htons(8080));
-  start_socket(socket_fd);
-
-  int epoll_fd = init_epoll();
-  register_socket(epoll_fd, socket_fd);
+void run(const Root& root) {
+  std::map<int, Server> sockets;
+  init_sockets(root.getServers(), sockets);
+  int epoll_fd = init_epoll(sockets);
 
   std::cout << "Server running" << std::endl;
-  loop_epoll(epoll_fd, socket_fd);
+  loop_epoll(epoll_fd, sockets);
 
-  close(socket_fd);
+  for (std::map<int, Server>::iterator it = sockets.begin();
+       it != sockets.end(); ++it) {
+    close(it->first);
+  }
   close(epoll_fd);
-  return 0;
 }
