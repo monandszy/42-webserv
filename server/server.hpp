@@ -22,6 +22,7 @@
 namespace server {
 void run(const Root& root);
 }
+
 namespace listener {
 void init_sockets(const std::vector<Server>& servers,
                   std::map<int, Server>& sockets);
@@ -36,7 +37,12 @@ enum HandleResult { KEEP_CONNECTION, DROP_CONNECTION };
 
 namespace request_handler {
 int process_connect(int epoll_fd, int socket_fd);
-HandleResult process_request(int epoll_fd, uint32_t events, Client& client);
+HandleResult process_request(int epoll_fd, uint32_t events, Client& client,
+                             Server& server);
 }  // namespace request_handler
+
+namespace response_builder {
+HandleResult process_response(Client& client, Server& server);
+}
 
 #endif

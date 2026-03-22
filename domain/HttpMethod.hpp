@@ -1,6 +1,6 @@
 #ifndef HTTPMETHOD_HPP
 #define HTTPMETHOD_HPP
 
-enum HttpMethod { NONE, GET, POST, DELETE };
+enum HttpMethod { UNKNOWN, GET, POST, DELETE };
 
 #endif

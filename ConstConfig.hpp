@@ -20,5 +20,6 @@ const bool REUSE_ADDRESS = 1;
 const int LIMIT = 64;
 const size_t RECV_SIZE = 11;
 const int BASE = 10;
+const unsigned long MAX_BODY_SIZE = 1024;
 
 #endif

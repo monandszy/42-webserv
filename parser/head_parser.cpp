@@ -20,7 +20,7 @@ void parseRequestLine(const std::string& line, HttpRequest& request) {
   else if (method == "DELETE")
     request.setMethod(DELETE);
   else
-    throw std::runtime_error("Unknown HTTP metod!");
+    throw std::runtime_error("Unknown HTTP method!");
 
   request.setUri(uri);
   request.setVersion(version);
@@ -35,7 +35,8 @@ void parseHeaderLine(const std::string& line, HttpRequest& request) {
   }
 }
 
-void parser::parseHead(const std::string& raw, HttpRequest& request) {
+HttpRequest parser::parseHead(const std::string& raw) {
+  HttpRequest request;
   std::istringstream stream(raw);
   std::string line;
 
@@ -55,4 +56,5 @@ void parser::parseHead(const std::string& raw, HttpRequest& request) {
   } else {
     request.setBodySize(0);
   }
+  return request;
 }

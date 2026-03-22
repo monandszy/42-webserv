@@ -8,13 +8,15 @@ SRC = \
 	domain/Server.cpp \
 	domain/Client.cpp \
 	domain/HttpRequest.cpp \
+	domain/HttpResponse.cpp \
 	fixtures/provider.cpp \
 	server/server_loop.cpp \
 	server/request_handler.cpp \
 	parser/head_parser.cpp \
 	server/multiplexer.cpp \
 	server/listener.cpp \
-	parser/parser.cpp
+	parser/parser.cpp \
+	server/response_builder.cpp
 
 
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.cpp=.o))

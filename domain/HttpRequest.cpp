@@ -1,7 +1,7 @@
 #include "HttpRequest.hpp"
 
 HttpRequest::HttpRequest() {
-  _method = NONE;
+  _method = UNKNOWN;
   _body_size = 0;
 }
 
@@ -54,7 +54,7 @@ void HttpRequest::setHeader(const std::string& key, const std::string& value) {
 }
 
 void HttpRequest::reset() {
-  _method = NONE;
+  _method = UNKNOWN;
   _uri.clear();
   _version.clear();
   _headers.clear();
@@ -75,7 +75,7 @@ std::ostream& operator<<(std::ostream& os, const HttpRequest& req) {
       methodStr = "DELETE";
       break;
     default:
-      methodStr = "NONE";
+      methodStr = "UNKNOWN";
       break;
   }
 

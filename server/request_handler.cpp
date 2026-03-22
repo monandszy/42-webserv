@@ -1,6 +1,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "../parser/parser.hpp"
 #include "server.hpp"
 
 int request_handler::process_connect(int epoll_fd, int socket_fd) {
@@ -22,10 +23,11 @@ int request_handler::process_connect(int epoll_fd, int socket_fd) {
 }
 
 int process_head(Client& client) {
-  size_t end_pos = client.getBuffer().find(HTTP_END);
+  size_t end_pos = client.getRequestBuffer().find(HTTP_END);
   if (end_pos != std::string::npos) {
-    client.buildRequest(end_pos);
-    client.consume(end_pos + HTTP_END.size());
+    std::string head = client.getRequestBuffer().substr(0, end_pos);
+    client.setRequest(parser::parseHead(head));
+    client.consumeRequest(end_pos + HTTP_END.size());
 
     if (client.getRequest().getMethod() == POST &&
         client.getRequest().getBodySize() > 0) {
@@ -39,10 +41,12 @@ int process_head(Client& client) {
 }
 
 int process_body(Client& client) {
-  if (client.getBuffer().size() >= client.getRequest().getBodySize()) {
-    client.buildRequestBody();
+  if (client.getRequestBuffer().size() >= client.getRequest().getBodySize()) {
+    HttpRequest req = client.getRequest();
+    req.setBody(client.getRequestBuffer().substr(0, req.getBodySize()));
+    client.setRequest(req);
 
-    client.consume(client.getRequest().getBodySize());
+    client.consumeRequest(client.getRequest().getBodySize());
 
     client.setStatus(READY_TO_RESPOND);
     return 1;
@@ -51,29 +55,11 @@ int process_body(Client& client) {
 }
 
 HandleResult read_chunk(Client& client) {
-  char tmp_buffer[RECV_SIZE];
-  ssize_t bytes = recv(client.getFd(), tmp_buffer, sizeof(tmp_buffer) - 1, 0);
+  char recv_buffer[RECV_SIZE];
+  ssize_t bytes = recv(client.getFd(), recv_buffer, sizeof(recv_buffer) - 1, 0);
 
   if (bytes <= 0) return DROP_CONNECTION;
-  client.append(tmp_buffer, bytes);
-  return KEEP_CONNECTION;
-}
-
-HandleResult process_response(Client& client) {
-  if (client.getResponseBuffer().empty()) {
-    std::cout << "Fully parsed " << client << "\n";
-    const char* resp = "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK";
-    client.appendResponse(resp);
-  }
-
-  const std::string& buf = client.getResponseBuffer();
-  ssize_t sent = send(client.getFd(), buf.c_str(), buf.size(), 0);
-
-  if (sent <= 0) {
-    return DROP_CONNECTION;
-  }
-
-  client.consumeResponse(sent);
+  client.appendRequest(recv_buffer, bytes);
   return KEEP_CONNECTION;
 }
 
@@ -97,7 +83,7 @@ bool is_alive(Client& client) {
 }
 
 HandleResult request_handler::process_request(int epoll_fd, uint32_t events,
-                                              Client& client) {
+                                              Client& client, Server& server) {
   if (events & EPOLLIN) {
     if (read_chunk(client) == DROP_CONNECTION) {
       return DROP_CONNECTION;
@@ -107,9 +93,8 @@ HandleResult request_handler::process_request(int epoll_fd, uint32_t events,
   bool progress;
   do {
     progress = false;
-
     switch (client.getStatus()) {
-      case READING_HEADERS: {
+      case READING_HEAD: {
         if (process_head(client)) progress = true;
         break;
       }
@@ -119,7 +104,8 @@ HandleResult request_handler::process_request(int epoll_fd, uint32_t events,
       }
       case READY_TO_RESPOND: {
         if (events & EPOLLOUT) {
-          if (process_response(client) == DROP_CONNECTION)
+          if (response_builder::process_response(client, server) ==
+              DROP_CONNECTION)
             return DROP_CONNECTION;
 
           if (client.getResponseBuffer().empty()) {

@@ -15,7 +15,7 @@
 namespace parser {
 uint32_t parse_string_ip(const char* ip_str);
 uint16_t parse_string_port(const char* port_str);
-void parseHead(const std::string& raw, HttpRequest& request);
+HttpRequest parseHead(const std::string& raw);
 }  // namespace parser
 
 #endif
