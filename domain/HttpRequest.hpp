@@ -35,7 +35,6 @@ class HttpRequest {
   void setMethod(const HttpMethod& method);
   void setUri(const std::string& uri);
   void setVersion(const std::string& version);
-  void setHeaders(const std::map<std::string, std::string>& headers);
   void setBody(const std::string& body);
   void setBodySize(size_t size);
   void setHeader(const std::string& key, const std::string& value);

@@ -10,16 +10,16 @@
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 
-enum CLIENT_STATUS {
+enum ClientStatus {
   READING_HEAD,  // Waiting for \r\n\r\n HTTP_END
   READING_BODY,  // Waiting for body to match Content-Length
-  READY_TO_RESPOND,
+  READY_TO_RESPOND
 };
 
 class Client {
  private:
   int _fd;
-  CLIENT_STATUS _status;
+  ClientStatus _status;
   std::string _requestbuffer;
   std::string _responsebuffer;
   HttpRequest _request;
@@ -32,7 +32,7 @@ class Client {
   Client& operator=(const Client& other);
   ~Client();
   int getFd() const;
-  CLIENT_STATUS getStatus() const;
+  ClientStatus getStatus() const;
   const std::string& getRequestBuffer() const;
   const HttpRequest& getRequest() const;
   void consumeRequest(size_t n);
@@ -47,10 +47,12 @@ class Client {
   void consumeResponse(size_t n);
   void appendResponse(const std::string& data);
 
-  void setStatus(CLIENT_STATUS status);
+  void setStatus(ClientStatus status);
 
   void reset();
 };
+
+std::string client_status_to_str(ClientStatus status);
 
 std::ostream& operator<<(std::ostream& os, const Client& client);
 

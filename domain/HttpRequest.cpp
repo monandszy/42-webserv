@@ -42,10 +42,6 @@ const std::string& HttpRequest::getHeader(const std::string& key) const {
 void HttpRequest::setMethod(const HttpMethod& method) { _method = method; }
 void HttpRequest::setUri(const std::string& uri) { _uri = uri; }
 void HttpRequest::setVersion(const std::string& version) { _version = version; }
-void HttpRequest::setHeaders(
-    const std::map<std::string, std::string>& headers) {
-  _headers = headers;
-}
 void HttpRequest::setBody(const std::string& body) { _body = body; }
 void HttpRequest::setBodySize(size_t size) { _body_size = size; }
 
@@ -63,24 +59,8 @@ void HttpRequest::reset() {
 }
 
 std::ostream& operator<<(std::ostream& os, const HttpRequest& req) {
-  std::string methodStr;
-  switch (req.getMethod()) {
-    case GET:
-      methodStr = "GET";
-      break;
-    case POST:
-      methodStr = "POST";
-      break;
-    case DELETE:
-      methodStr = "DELETE";
-      break;
-    default:
-      methodStr = "UNKNOWN";
-      break;
-  }
-
   os << "HttpRequest {\n"
-     << "  Method: " << methodStr << "\n"
+     << "  Method: " << http_method_to_str(req.getMethod()) << "\n"
      << "  URI: " << req.getUri() << "\n"
      << "  Version: " << req.getVersion() << "\n"
      << "  Headers: \n";

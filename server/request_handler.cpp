@@ -22,16 +22,16 @@ int request_handler::process_connect(int epoll_fd, int socket_fd) {
   return client_fd;
 }
 
-int process_head(Client& client) {
+int process_head(Client& client, Server& server) {
   size_t end_pos = client.getRequestBuffer().find(HTTP_END);
-  std::cout << "Status: " << client << "\n";
   if (end_pos != std::string::npos) {
     std::string head = client.getRequestBuffer().substr(0, end_pos);
     client.setRequest(parser::parseHead(head));
     client.consumeRequest(end_pos + HTTP_END.size());
 
-    if (client.getRequest().getMethod() == POST &&
-        client.getRequest().getBodySize() > 0) {
+    size_t body_size = client.getRequest().getBodySize();
+    if (client.getRequest().getMethod() == POST && body_size > 0 &&
+        body_size <= server.getBodySize()) {
       client.setStatus(READING_BODY);
     } else {
       client.setStatus(READY_TO_RESPOND);
@@ -96,7 +96,7 @@ HandleResult request_handler::process_request(int epoll_fd, uint32_t events,
     progress = false;
     switch (client.getStatus()) {
       case READING_HEAD: {
-        if (process_head(client)) progress = true;
+        if (process_head(client, server)) progress = true;
         break;
       }
       case READING_BODY: {

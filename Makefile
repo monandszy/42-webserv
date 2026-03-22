@@ -9,6 +9,7 @@ SRC = \
 	domain/Client.cpp \
 	domain/HttpRequest.cpp \
 	domain/HttpResponse.cpp \
+	domain/enum_to_str.cpp \
 	fixtures/provider.cpp \
 	server/server_loop.cpp \
 	server/request_handler.cpp \

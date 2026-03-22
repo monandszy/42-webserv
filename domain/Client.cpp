@@ -33,7 +33,7 @@ Client::~Client() {}
 
 int Client::getFd() const { return _fd; }
 
-CLIENT_STATUS Client::getStatus() const { return _status; }
+ClientStatus Client::getStatus() const { return _status; }
 
 const std::string& Client::getRequestBuffer() const { return _requestbuffer; }
 
@@ -57,7 +57,7 @@ void Client::appendResponse(const std::string& data) {
   _responsebuffer.append(data);
 }
 
-void Client::setStatus(CLIENT_STATUS status) { _status = status; }
+void Client::setStatus(ClientStatus status) { _status = status; }
 
 void Client::reset() {
   _status = READING_HEAD;
@@ -66,26 +66,23 @@ void Client::reset() {
   _responsebuffer.clear();
 }
 
-std::ostream& operator<<(std::ostream& os, const Client& client) {
-  std::string statusStr;
-  switch (client.getStatus()) {
+std::string client_status_to_str(ClientStatus status) {
+  switch (status) {
     case READING_HEAD:
-      statusStr = "READING_HEAD";
-      break;
+      return ("READING_HEAD");
     case READING_BODY:
-      statusStr = "READING_BODY";
-      break;
+      return ("READING_BODY");
     case READY_TO_RESPOND:
-      statusStr = "READY_TO_RESPOND";
-      break;
+      return ("READY_TO_RESPOND");
     default:
-      statusStr = "UNKNOWN";
-      break;
+      return ("UNKNOWN");
   }
+}
 
+std::ostream& operator<<(std::ostream& os, const Client& client) {
   os << "Client {\n"
      << "  FD: " << client.getFd() << "\n"
-     << "  Status: " << statusStr << "\n"
+     << "  Status: " << client_status_to_str(client.getStatus()) << "\n"
      << "  RequestBuffer:\n[" << client.getRequestBuffer() << "]\n"
      << "  ResponseBuffer:\n[" << client.getResponseBuffer() << "]\n"
      << "  Request: " << client.getRequest() << "\n"

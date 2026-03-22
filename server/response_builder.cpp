@@ -4,8 +4,11 @@
   Decide the result of the request based on data in Root and Server
 */
 void resolve(Client& client, Server& server) {
-  (void)client;
-  (void)server;
+  HttpResponse response;
+  if (client.getRequest().getBodySize() > server.getBodySize()) {
+    response.setStatus(PAYLOAD_TOO_LARGE);
+  }
+  client.setResponse(response);
 }
 
 /*

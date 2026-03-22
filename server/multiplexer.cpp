@@ -30,11 +30,6 @@ int multiplexer::init_epoll(std::map<int, Server>& sockets) {
   return epoll_fd;
 }
 
-/*
-  limit - ammount of events epoll will return at a time, unrelated to the num of
-  clients connected
-  -1 - sleep indefinitely unitl something happens
-*/
 void multiplexer::loop_epoll(int epoll_fd, std::map<int, Server>& sockets) {
   struct epoll_event events[LIMIT];
   std::map<int, Client> clients;
