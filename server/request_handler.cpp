@@ -24,6 +24,7 @@ int request_handler::process_connect(int epoll_fd, int socket_fd) {
 
 int process_head(Client& client) {
   size_t end_pos = client.getRequestBuffer().find(HTTP_END);
+  std::cout << "Status: " << client << "\n";
   if (end_pos != std::string::npos) {
     std::string head = client.getRequestBuffer().substr(0, end_pos);
     client.setRequest(parser::parseHead(head));

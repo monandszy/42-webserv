@@ -38,26 +38,28 @@ int multiplexer::init_epoll(std::map<int, Server>& sockets) {
 void multiplexer::loop_epoll(int epoll_fd, std::map<int, Server>& sockets) {
   struct epoll_event events[LIMIT];
   std::map<int, Client> clients;
+  std::map<int, int> client_to_server;
   while (true) {
     int num_ready = epoll_wait(epoll_fd, events, LIMIT, TIMEOUT);
     for (int i = 0; i < num_ready; i++) {
-      int client_fd = events[i].data.fd;
-      std::map<int, Server>::iterator server = sockets.find(client_fd);
-      if (server != sockets.end()) {
-        int new_client_fd =
-            request_handler::process_connect(epoll_fd, client_fd);
-        if (new_client_fd >= 0) {
-          Client c(new_client_fd);
-          clients.insert(std::make_pair(new_client_fd, c));
+      int event_fd = events[i].data.fd;
+      if (sockets.find(event_fd) != sockets.end()) {
+        int client_fd = request_handler::process_connect(epoll_fd, event_fd);
+        if (client_fd >= 0) {
+          Client c(client_fd);
+          clients.insert(std::make_pair(client_fd, c));
+          client_to_server[client_fd] = event_fd;
           std::cout << "Client connected" << std::endl;
         }
-      } else {
+      } else if (clients.find(event_fd) != clients.end()) {
+        int server_fd = client_to_server[event_fd];
         if (request_handler::process_request(
-                epoll_fd, events[i].events, clients[client_fd],
-                sockets[client_fd]) == DROP_CONNECTION) {
+                epoll_fd, events[i].events, clients[event_fd],
+                sockets[server_fd]) == DROP_CONNECTION) {
           std::cout << "Client disconnected" << std::endl;
-          clients.erase(client_fd);
-          close(client_fd);
+          clients.erase(event_fd);
+          client_to_server.erase(event_fd);
+          close(event_fd);
         }
       }
     }

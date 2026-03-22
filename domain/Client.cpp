@@ -5,11 +5,15 @@
 Client::Client() {
   _fd = -1;
   _status = READING_HEAD;
+  _responsebuffer = "";
+  _requestbuffer = "";
 }
 
 Client::Client(int fd) {
   _fd = fd;
   _status = READING_HEAD;
+  _responsebuffer = "";
+  _requestbuffer = "";
 }
 
 Client::Client(const Client& other) { *this = other; }
