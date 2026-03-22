@@ -60,7 +60,7 @@ HandleResult read_chunk(Client& client) {
   ssize_t bytes = recv(client.getFd(), recv_buffer, sizeof(recv_buffer) - 1, 0);
 
   if (bytes <= 0) return DROP_CONNECTION;
-  client.appendRequest(recv_buffer, bytes);
+  client.appendRequestBuffer(recv_buffer, bytes);
   return KEEP_CONNECTION;
 }
 
@@ -105,7 +105,7 @@ HandleResult request_handler::process_request(int epoll_fd, uint32_t events,
       }
       case READY_TO_RESPOND: {
         if (events & EPOLLOUT) {
-          if (response_builder::process_response(client, server) ==
+          if (response_serializer::process_response(client, server) ==
               DROP_CONNECTION)
             return DROP_CONNECTION;
 

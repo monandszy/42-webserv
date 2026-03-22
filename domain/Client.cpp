@@ -47,13 +47,13 @@ void Client::setResponse(const HttpResponse& response) { _response = response; }
 
 void Client::consumeRequest(size_t n) { _requestbuffer.erase(0, n); }
 
-void Client::appendRequest(const char* data, size_t len) {
+void Client::appendRequestBuffer(const char* data, size_t len) {
   _requestbuffer.append(data, len);
 }
 
 void Client::consumeResponse(size_t n) { _responsebuffer.erase(0, n); }
 
-void Client::appendResponse(const std::string& data) {
+void Client::appendResponseBuffer(const std::string& data) {
   _responsebuffer.append(data);
 }
 

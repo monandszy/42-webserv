@@ -36,7 +36,7 @@ class Client {
   const std::string& getRequestBuffer() const;
   const HttpRequest& getRequest() const;
   void consumeRequest(size_t n);
-  void appendRequest(const char* data, size_t len);
+  void appendRequestBuffer(const char* data, size_t len);
 
   const std::string& getResponseBuffer() const;
   const HttpResponse& getResponse() const;
@@ -45,7 +45,7 @@ class Client {
   void setResponse(const HttpResponse& response);
 
   void consumeResponse(size_t n);
-  void appendResponse(const std::string& data);
+  void appendResponseBuffer(const std::string& data);
 
   void setStatus(ClientStatus status);
 

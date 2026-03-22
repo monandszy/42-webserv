@@ -17,7 +17,8 @@ SRC = \
 	server/multiplexer.cpp \
 	server/listener.cpp \
 	parser/parser.cpp \
-	server/response_builder.cpp
+	server/response_serializer.cpp \
+	server/router.cpp
 
 
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.cpp=.o))

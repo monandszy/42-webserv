@@ -41,8 +41,12 @@ HandleResult process_request(int epoll_fd, uint32_t events, Client& client,
                              Server& server);
 }  // namespace request_handler
 
-namespace response_builder {
+namespace response_serializer {
 HandleResult process_response(Client& client, Server& server);
+}
+
+namespace router {
+HttpResponse route_request(const HttpRequest& request, Server& server);
 }
 
 #endif
