@@ -6,12 +6,19 @@ SRC = \
 	domain/Root.cpp \
 	domain/Location.cpp \
 	domain/Server.cpp \
+	domain/Client.cpp \
+	domain/HttpRequest.cpp \
+	domain/HttpResponse.cpp \
+	domain/enum_to_str.cpp \
 	fixtures/provider.cpp \
 	server/server_loop.cpp \
-	server/poller.cpp \
 	server/request_handler.cpp \
+	parser/head_parser.cpp \
+	server/multiplexer.cpp \
 	server/listener.cpp \
-	parser/parser.cpp
+	parser/parser.cpp \
+	server/response_serializer.cpp \
+	server/router.cpp
 
 
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.cpp=.o))

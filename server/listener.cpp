@@ -8,6 +8,7 @@
   SOCK_STREAM = TCP
 
   Set SO_REUSEADDR to 1 (True) Allow Address Reuse
+  Set O_NONBLOCK while preserving flags
 */
 int create_socket() {
   struct protoent* proto = getprotobyname("tcp");
@@ -20,7 +21,13 @@ int create_socket() {
 
   int o = 1;
   if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &o, sizeof(o)) == -1) {
-    throw std::runtime_error("Failed to set socket options.");
+    throw std::runtime_error("Failed to set socket SO_REUSEADDR.");
+  }
+
+  int flags = fcntl(socket_fd, F_GETFL);
+  int status = fcntl(socket_fd, F_SETFL, flags | O_NONBLOCK);
+  if (status == -1) {
+    throw std::runtime_error("Failed to set socket O_NONBLOCK");
   }
   return socket_fd;
 }

@@ -15,7 +15,7 @@ uint32_t parser::parse_string_ip(const char *ip_str) {
 
 uint16_t parser::parse_string_port(const char *port_str) {
   char *endptr;
-  long port_num = std::strtol(port_str, &endptr, 10);
+  long port_num = std::strtol(port_str, &endptr, BASE);
 
   if (*endptr != '\0' || port_num <= 0 || port_num > 65535) {
     throw std::invalid_argument("Invalid port number");

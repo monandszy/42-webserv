@@ -4,10 +4,10 @@
 
 Root createRootFixture() {
   Root root;
-  root.setBodySize(1024);
 
   // First server
   Server server1("127.0.0.1", "8080", "first.com");
+  server1.setBodySize(1024);
   server1.addErrorPage(404, "/404.html");
   server1.addErrorPage(500, "/50x.html");
   server1.addErrorPage(502, "/50x.html");
